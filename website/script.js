@@ -137,7 +137,7 @@ async function sendFilesToServer() {
     alert(resultText);
   } catch (error) {
     console.error('Upload failed:', error);
-    alert('Could not connect to the Python server.');
+    alert(`Upload failed: ${error.message}`);
   }
 }
 
