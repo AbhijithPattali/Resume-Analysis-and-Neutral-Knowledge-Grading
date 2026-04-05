@@ -1,8 +1,13 @@
 from flask import Flask, request
+from flask_cors import CORS
 from PyPDF2 import PdfReader
 import io
 
 app = Flask(__name__)
+app.config["MAX_CONTENT_LENGTH"] = 5 * 1024 * 1024  # 5 MB max upload
+CORS(app, resources={r"/upload-cvs": {"origins": "http://127.0.0.1:5500"}})
+
+MAX_PRINT_CHARS = 10000
 
 @app.route("/upload-cvs", methods=["POST"])
 def upload_cvs():
@@ -30,7 +35,11 @@ def upload_cvs():
                 full_text += text + " "
 
         print("Extracted text:\n")
-        print(full_text[:800] + "..." if len(full_text) > 800 else full_text)
+        if len(full_text) <= MAX_PRINT_CHARS:
+            print(full_text)
+        else:
+            print(full_text[:MAX_PRINT_CHARS])
+            print("\n[Output truncated because extracted text was too large.]")
         print("\n" + "-" * 40)
 
     return "CVs processed. Check terminal for text.", 200
