@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>RANK</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+
+  <nav class="navbar">
+  <a href="main.html">Home</a>
+  <a href="#">Ranked List</a>
+  <a href="#">About Us</a>
+  <a href="#">Contact Us</a>
+</nav>
+
+  <div class="wrapper">
+    <h1>Resume Analysis and Neutral Knowledge Grading</h1>
+    <p>Select multiple CV files or drag and drop them into the box.</p>
+
+    <div class="upload-box" id="uploadBox">
+      <p>Drag and drop CVs files here (Demo only accepts PDFs)</p>
+      <div class="actions">
+        <button id="chooseFilesBtn" type="button">Choose files</button>
+        <input id="fileInput" type="file" accept="application/pdf,.pdf" multiple />
+        <button id="sendToServerBtn" type="button">Continue</button>
+      </div>
+      <p id="fileCounter" class="small"></p>
+      <p class="small">Files are stored temporarily in browser memory for this session only.</p>
+    </div>
+
+    <div class="file-list">
+      <h2>Uploaded CVs can be Viewed Here</h2>
+      <div id="fileList" class="empty">No CVs uploaded yet.</div>
+    </div>
+  </div>
+
+  <script src="script.js"></script>
+
+  <div class="footer">
+      <p>This is a demo application made for Heriot-Watt University.</p>
+    </div>  
+</body>
+</html>
