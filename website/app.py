@@ -13,9 +13,8 @@ MAX_PRINT_CHARS = 10000
 
 @app.route("/upload-cvs", methods=["POST"])
 def upload_cvs():
-    print("\n" + "=" * 60)
-    print("RECEIVED UPLOADED CVs")
-    print("=" * 60 + "\n")
+    
+    print ()
 
     cv_files = request.files.getlist("cv_files")
 
@@ -24,8 +23,6 @@ def upload_cvs():
         return "No files received", 400
 
     for i, file in enumerate(cv_files):
-        print(f"\nCV {i+1}: {file.filename}")
-        print("-" * 40)
 
         file_stream = io.BytesIO(file.read())
         pdf = PdfReader(file_stream)
@@ -35,8 +32,6 @@ def upload_cvs():
             text = page.extract_text()
             if text:
                 full_text += text + " "
-
-        print("Extracted text:\n")
         
         safe_text = full_text[:MAX_PRINT_CHARS]
         clean_text = safe_text.translate(str.maketrans('', '', '|-,'))
@@ -48,9 +43,9 @@ def upload_cvs():
         
         if len(full_text) > MAX_PRINT_CHARS:
             print("\n[Output truncated because extracted text was too large.]")
-        
-        print("\n" + "-" * 40)
 
+        print ()
+        
     return "CVs processed. Check terminal for text.", 200
 
 if __name__ == "__main__":
