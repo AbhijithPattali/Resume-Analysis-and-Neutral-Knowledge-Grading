@@ -1,3 +1,5 @@
+import re
+
 from flask import Flask, request
 from flask_cors import CORS
 from PyPDF2 import PdfReader
@@ -35,11 +37,18 @@ def upload_cvs():
                 full_text += text + " "
 
         print("Extracted text:\n")
-        if len(full_text) <= MAX_PRINT_CHARS:
-            print(full_text)
-        else:
-            print(full_text[:MAX_PRINT_CHARS])
+        
+        safe_text = full_text[:MAX_PRINT_CHARS]
+        clean_text = safe_text.translate(str.maketrans('', '', '|-,'))
+        clean_text = re.sub(r'(?<!\w)\.|(?<=\w)\.(?!\w)', '', clean_text)
+        words = clean_text.split()
+        formatted_text = "{" + ", ".join(words) + "}"
+        
+        print(formatted_text)
+        
+        if len(full_text) > MAX_PRINT_CHARS:
             print("\n[Output truncated because extracted text was too large.]")
+        
         print("\n" + "-" * 40)
 
     return "CVs processed. Check terminal for text.", 200
