@@ -4,6 +4,7 @@ const fileInput = document.getElementById('fileInput');
 const fileList = document.getElementById('fileList');
 const fileCounter = document.getElementById('fileCounter');
 const sendToServerBtn = document.getElementById('sendToServerBtn');
+const jsonDownload = document.getElementById('jsonDownload');
 
 const temporaryFiles = [];
 const MAX_FILES = 20;
@@ -135,9 +136,19 @@ async function sendFilesToServer() {
 
     const resultText = await response.text();
     alert(resultText);
+
+    if (response.ok) {
+      jsonDownload.innerHTML = `
+        <a href="http://127.0.0.1:5000/download-json" target="_blank">
+          Click here to download raw JSON
+        </a>
+      `;
+    } else {
+      jsonDownload.textContent = '';
+    }
   } catch (error) {
     console.error('Upload failed:', error);
-    alert(`Upload failed: ${error.message}`);
+    jsonDownload.textContent = '';
   }
 }
 

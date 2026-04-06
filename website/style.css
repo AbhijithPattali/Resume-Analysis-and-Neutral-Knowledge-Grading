@@ -105,3 +105,14 @@ input[type="file"] {
   z-index: 1000;          /* Above content */
   line-height: 1.3;
 }
+
+#jsonDownload {
+  color: #1a73e8;
+  text-decoration: underline;
+  cursor: pointer;
+  display: inline-block;
+}
+
+#jsonDownload:hover {
+  color: #0b57d0;
+}
