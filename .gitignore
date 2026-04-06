@@ -1,0 +1,28 @@
+# Python cache
+__pycache__/
+*.py[cod]
+
+# Virtual environments
+.venv/
+venv/
+env/
+ENV/
+
+# Flask / local app data
+instance/
+
+# VS Code
+.vscode/
+
+# Environment files
+.env
+
+# Generated output files
+*.json
+
+# Logs
+*.log
+
+# OS files
+.DS_Store
+Thumbs.db
