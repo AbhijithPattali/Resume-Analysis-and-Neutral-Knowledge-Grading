@@ -1,17 +1,23 @@
+
 import io
 import json
 import re
 
-from flask import Flask, request, send_file, jsonify
+from flask import Flask, request, send_file
 from flask_cors import CORS
 from PyPDF2 import PdfReader
 
+
+# Create the Flask application
 app = Flask(__name__)
 
+# Limit the total upload size to 5 MB
 app.config["MAX_CONTENT_LENGTH"] = 5 * 1024 * 1024
 
+# Allow requests from the local frontend during testing
 CORS(app, resources={r"/upload-cvs": {"origins": "http://127.0.0.1:5500"}})
 
+# Limit how much extracted PDF text is processed
 MAX_PRINT_CHARS = 10000
 
 
@@ -33,7 +39,7 @@ def extract_text_from_pdf(uploaded_file):
 
 def clean_and_split_text(full_text):
     """
-    Clean the extracted text and convert it into a list of words.
+    Clean extracted text and convert it into a list of words.
     """
     safe_text = full_text[:MAX_PRINT_CHARS]
 
@@ -49,10 +55,8 @@ def clean_and_split_text(full_text):
 
 def save_cv_data_to_json(cv_data):
     """
-    Save all CV data into list.json.
-    If the file exists, overwrite it.
-    If it does not exist, create it.
-    Keep each words list on one line.
+    Save all extracted CV data into list.json.
+    Overwrite the file each time the user uploads a new set of CVs.
     """
     with open("list.json", "w", encoding="utf-8") as json_file:
         json_file.write("[\n")
@@ -67,12 +71,12 @@ def save_cv_data_to_json(cv_data):
 
         json_file.write("]\n")
 
+
 @app.route("/upload-cvs", methods=["POST"])
 def upload_cvs():
     """
-    Receive uploaded CV PDFs from the website,
-    extract words from each file,
-    and save the result into list.json.
+    Receive uploaded CV PDFs, extract their text, tokenize the content,
+    and save the final result into list.json.
     """
     cv_files = request.files.getlist("cv_files")
 
@@ -81,6 +85,7 @@ def upload_cvs():
 
     all_cvs_data = []
 
+    # Process each uploaded PDF file one by one
     for file in cv_files:
         full_text = extract_text_from_pdf(file)
         words, was_truncated = clean_and_split_text(full_text)
@@ -97,9 +102,14 @@ def upload_cvs():
 
     return "CVs processed. Data saved to list.json.", 200
 
+
 @app.route("/download-json", methods=["GET"])
 def download_json():
+    """
+    Let the user download the generated JSON file.
+    """
     return send_file("list.json", as_attachment=True, download_name="list.json")
+
 
 if __name__ == "__main__":
     app.run(host="127.0.0.1", port=5000, debug=True)

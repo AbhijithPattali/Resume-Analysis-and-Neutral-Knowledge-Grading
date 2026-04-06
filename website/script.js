@@ -1,3 +1,5 @@
+
+// Get the main page elements used by the upload interface
 const uploadBox = document.getElementById('uploadBox');
 const chooseFilesBtn = document.getElementById('chooseFilesBtn');
 const fileInput = document.getElementById('fileInput');
@@ -6,13 +8,16 @@ const fileCounter = document.getElementById('fileCounter');
 const sendToServerBtn = document.getElementById('sendToServerBtn');
 const jsonDownload = document.getElementById('jsonDownload');
 
+// Store selected files temporarily in browser memory
 const temporaryFiles = [];
 const MAX_FILES = 20;
 
+// Button and input event setup
 chooseFilesBtn.addEventListener('click', () => fileInput.click());
 fileInput.addEventListener('change', (event) => handleFiles(event.target.files));
 sendToServerBtn.addEventListener('click', sendFilesToServer);
 
+// Highlight the upload area while files are dragged over it
 ['dragenter', 'dragover'].forEach((eventName) => {
   uploadBox.addEventListener(eventName, (event) => {
     event.preventDefault();
@@ -20,6 +25,7 @@ sendToServerBtn.addEventListener('click', sendFilesToServer);
   });
 });
 
+// Remove highlight when dragging ends or files are dropped
 ['dragleave', 'drop'].forEach((eventName) => {
   uploadBox.addEventListener(eventName, (event) => {
     event.preventDefault();
@@ -27,6 +33,7 @@ sendToServerBtn.addEventListener('click', sendFilesToServer);
   });
 });
 
+// Handle files dropped into the upload area
 uploadBox.addEventListener('drop', (event) => {
   const droppedFiles = event.dataTransfer.files;
   handleFiles(droppedFiles);
@@ -34,25 +41,27 @@ uploadBox.addEventListener('drop', (event) => {
 
 function handleFiles(fileCollection) {
   const files = Array.from(fileCollection);
+  const totalAfterUpload = temporaryFiles.length + files.length;
 
-  // Calculation to check if we exceded the max files limit
-  const willBeTotal = temporaryFiles.length + files.length;
-
-  if (willBeTotal > MAX_FILES) {
+  // Stop the user if the total file count would exceed the limit
+  if (totalAfterUpload > MAX_FILES) {
     alert(`You can upload at most ${MAX_FILES} files in total.`);
-    fileInput.value = ""; // reset the input
+    fileInput.value = '';
     return;
   }
 
+  // Accept only PDF files
   files.forEach((file) => {
-    const isPdf = file.type === 'application/pdf' || file.name.toLowerCase().endsWith('.pdf');
+    const isPdf =
+      file.type === 'application/pdf' ||
+      file.name.toLowerCase().endsWith('.pdf');
 
     if (!isPdf) return;
 
     temporaryFiles.push({
       name: file.name,
       size: file.size,
-      file: file,
+      file: file
     });
   });
 
@@ -62,11 +71,9 @@ function handleFiles(fileCollection) {
 }
 
 function updateCounter() {
-    fileCounter.textContent = `In this Demo We are accepting only ${temporaryFiles.length}/${MAX_FILES} files`;
-  }
-
-
-
+  fileCounter.textContent =
+    `In this demo we are accepting only ${temporaryFiles.length}/${MAX_FILES} files`;
+}
 
 function renderFiles() {
   if (temporaryFiles.length === 0) {
@@ -92,6 +99,8 @@ function renderFiles() {
     const removeBtn = document.createElement('button');
     removeBtn.type = 'button';
     removeBtn.textContent = 'Remove';
+
+    // Remove one selected file from the temporary list
     removeBtn.addEventListener('click', () => {
       temporaryFiles.splice(index, 1);
       renderFiles();
@@ -124,6 +133,7 @@ async function sendFilesToServer() {
 
   const formData = new FormData();
 
+  // Add each selected PDF file to the request body
   temporaryFiles.forEach((item) => {
     formData.append('cv_files', item.file);
   });
@@ -137,6 +147,7 @@ async function sendFilesToServer() {
     const resultText = await response.text();
     alert(resultText);
 
+    // Show a download link only if the backend upload succeeded
     if (response.ok) {
       jsonDownload.innerHTML = `
         <a href="http://127.0.0.1:5000/download-json" target="_blank">
@@ -152,4 +163,5 @@ async function sendFilesToServer() {
   }
 }
 
-updateCounter(); 
+// Show the initial upload counter when the page loads
+updateCounter();

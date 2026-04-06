@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -8,38 +9,49 @@
 </head>
 <body>
 
+  <!-- Top navigation bar -->
   <nav class="navbar">
-  <a href="main.html">Home</a>
-  <a href="#">About Us</a>
-  <a href="#">Contact Us</a>
-</nav>
+    <a href="main.html">Home</a>
+    <a href="#">About Us</a>
+    <a href="#">Contact Us</a>
+  </nav>
 
+  <!-- Main page content -->
   <div class="wrapper">
     <h1>Resume Analysis and Neutral Knowledge Grading</h1>
     <p>Select multiple CV files or drag and drop them into the box.</p>
 
+    <!-- Upload area -->
     <div class="upload-box" id="uploadBox">
-      <p>Drag and drop CVs files here (Demo only accepts PDFs)</p>
+      <p>Drag and drop CV files here (demo only accepts PDFs).</p>
+
       <div class="actions">
         <button id="chooseFilesBtn" type="button">Choose files</button>
         <input id="fileInput" type="file" accept="application/pdf,.pdf" multiple />
         <button id="sendToServerBtn" type="button">Continue</button>
       </div>
+
+      <!-- File count and temporary storage message -->
       <p id="fileCounter" class="small"></p>
       <p class="small">Files are stored temporarily in browser memory for this session only.</p>
+
+      <!-- JSON download link appears here after successful upload -->
       <p id="jsonDownload" class="small"></p>
     </div>
 
+    <!-- Uploaded file preview list -->
     <div class="file-list">
-      <h2>Uploaded CVs can be Viewed Here</h2>
+      <h2>Uploaded CVs can be viewed here</h2>
       <div id="fileList" class="empty">No CVs uploaded yet.</div>
     </div>
   </div>
 
   <script src="script.js"></script>
 
+  <!-- Footer -->
   <div class="footer">
-      <p>This is a demo application is made for Heriot-Watt University.</p>
-    </div>  
+    <p>This demo application was made for Heriot-Watt University.</p>
+  </div>
+
 </body>
 </html>
