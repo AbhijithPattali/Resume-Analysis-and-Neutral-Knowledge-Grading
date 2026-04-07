@@ -2,6 +2,7 @@
 import io
 import json
 import re
+import os
 
 from flask import Flask, request, send_file
 from flask_cors import CORS
@@ -19,6 +20,12 @@ CORS(app, resources={r"/upload-cvs": {"origins": "http://127.0.0.1:5500"}})
 
 # Limit how much extracted PDF text is processed
 MAX_PRINT_CHARS = 10000
+
+
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+
+
+JSON_FILE_PATH = os.path.join(BASE_DIR, "list.json")
 
 
 def extract_text_from_pdf(uploaded_file):
@@ -58,7 +65,7 @@ def save_cv_data_to_json(cv_data):
     Save all extracted CV data into list.json.
     Overwrite the file each time the user uploads a new set of CVs.
     """
-    with open("list.json", "w", encoding="utf-8") as json_file:
+    with open(JSON_FILE_PATH, "w", encoding="utf-8") as json_file:
         json_file.write("[\n")
 
         for index, cv in enumerate(cv_data):
@@ -108,7 +115,7 @@ def download_json():
     """
     Let the user download the generated JSON file.
     """
-    return send_file("list.json", as_attachment=True, download_name="list.json")
+    return send_file(JSON_FILE_PATH, as_attachment=True, download_name="list.json")
 
 
 if __name__ == "__main__":
