@@ -1,17 +1,65 @@
-
+/* =========================================================
+   GLOBAL RESET
+   ---------------------------------------------------------
+   Default purpose:
+   - Makes width/height calculations predictable everywhere.
+   ========================================================= */
 * {
   box-sizing: border-box;
 }
 
+
+/* =========================================================
+   THEME TOKENS
+   ---------------------------------------------------------
+   Default purpose:
+   - Central place for dark-mode colors.
+   - If you want to tweak the site's look later, change values
+     here instead of hunting through the whole stylesheet.
+   ========================================================= */
+:root {
+  --bg-page: #48226E;
+  --bg-panel: #663399;
+  --bg-panel-hover: #7445B8;
+  --bg-control: #4ECDF9;
+  --bg-control-hover: #7ADFFF;
+  --bg-input: #582E87;
+
+  --border-soft: #8A68B8;
+  --border-mid: #B399CC;
+  --border-strong: #C7B3DB;
+
+  --text-main: #FFFFFF;
+  --text-muted: #E2D8EE;
+  --text-placeholder: #D6C5E8;
+
+  --tag-bg: #4ECDF9;
+  --tag-bg-hover: #7ADFFF;
+  --tag-text: #48226E;
+
+  --link: #4ECDF9;
+  --link-hover: #A8EEFF;
+
+  --radius-sm: 8px;
+  --radius-md: 12px;
+}
+
+
+/* =========================================================
+   PAGE LAYOUT
+   ---------------------------------------------------------
+   Default purpose:
+   - Applies global dark theme and vertical page layout.
+   ========================================================= */
 body {
   margin: 0;
-  padding-bottom: 40px; 
-  min-height: 100vh; 
+  padding-bottom: 40px;
+  min-height: 100vh;
   display: flex;
   flex-direction: column;
   font-family: Arial, sans-serif;
-  background: #121212;
-  color: #E0E0E0;
+  background: var(--bg-page);
+  color: var(--text-main);
 }
 
 .wrapper {
@@ -28,41 +76,90 @@ p {
   margin-top: 0;
 }
 
+
+/* =========================================================
+   MAIN UPLOAD / PHASE BOX
+   ---------------------------------------------------------
+   Default purpose:
+   - Shared outer container for phase 1 and phase 2.
+   - Same box style remains even when JS swaps content inside.
+   ========================================================= */
 .upload-box {
-  border: 2px dashed #444444;
-  background: #1E1E1E;
+  border: 2px dashed var(--border-mid);
+  background: var(--bg-panel);
   padding: 32px;
   text-align: center;
-  border-radius: 8px;
-  transition: 0.2s ease;
+  border-radius: var(--radius-sm);
+  transition: background 0.2s ease, border-color 0.2s ease;
 }
 
 .upload-box.dragover {
-  border-color: #444444;
-  background: #2A2A2A;
+  border-color: var(--border-mid);
+  background: var(--bg-panel-hover);
 }
 
+
+/* =========================================================
+   ACTION BUTTON AREA
+   ---------------------------------------------------------
+   Default purpose:
+   - Keeps buttons centered with spacing between them.
+   - Used for Choose files / Continue / Proceed / Restart.
+   ========================================================= */
 .actions {
-  margin: 16px;
+  margin: 16px 0;
+  display: flex;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 12px;
 }
 
+
+/* =========================================================
+   BUTTONS
+   ---------------------------------------------------------
+   Default purpose:
+   - Standard dark-mode button styling across the site.
+   ========================================================= */
 button {
   padding: 10px 16px;
-  border: 1px solid #555555;
-  background: #2D2D2D;
-  color: #E0E0E0;
+  border: 1px solid var(--border-strong);
+  background: var(--bg-control);
+  color: var(--tag-text);
   cursor: pointer;
+  border-radius: var(--radius-sm);
+  transition: background 0.2s ease, border-color 0.2s ease;
 }
 
+button:hover {
+  background: var(--bg-control-hover);
+  border-color: #666666;
+}
+
+button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+
+/* Hide the real file input because the custom button triggers it */
 input[type="file"] {
   display: none;
 }
 
+
+/* =========================================================
+   FILE LIST
+   ---------------------------------------------------------
+   Default purpose:
+   - Used in phase 1 and in phase 2 read-only display.
+   - Divider color updated for dark mode consistency.
+   ========================================================= */
 .file-list {
   margin-top: 24px;
-  background: #1E1E1E;
-  border: 1px solid #333333;
-  border-radius: 8px;
+  background: var(--bg-panel);
+  border: 1px solid var(--border-soft);
+  border-radius: var(--radius-sm);
   padding: 16px;
 }
 
@@ -70,9 +167,9 @@ input[type="file"] {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 10px 0;
-  border-bottom: 1px solid #eee;
   gap: 12px;
+  padding: 10px 0;
+  border-bottom: 1px solid var(--border-soft);
 }
 
 .file-item:last-child {
@@ -83,37 +180,153 @@ input[type="file"] {
   overflow-wrap: anywhere;
 }
 
+
+/* =========================================================
+   SMALL SUPPORT TEXT
+   ---------------------------------------------------------
+   Default purpose:
+   - Secondary helper text like file counter and demo notes.
+   ========================================================= */
 .small {
   font-size: 14px;
-  color: #B0B0B0;
+  color: var(--text-muted);
 }
 
 .empty {
-  color: #B0B0B0;
+  color: var(--text-muted);
 }
 
+
+/* =========================================================
+   TAG INPUT CONTAINER
+   ---------------------------------------------------------
+   Default purpose:
+   - Outer box used in phase 2 tag entry screen.
+   - Now matches the site's dark UI instead of white.
+   - Uses column layout so the textbox stays on top and the
+     generated tags appear below it.
+   ========================================================= */
+.tag-input-box {
+  width: 100%;
+  min-height: 180px;
+  padding: 14px;
+  border: 2px solid var(--border-mid);
+  border-radius: var(--radius-md);
+  background: var(--bg-panel);
+  display: flex;
+  flex-direction: column;
+  gap: 16px; /* Gap between textbox and tags area */
+  text-align: left;
+}
+
+
+/* =========================================================
+   TAG TEXT INPUT
+   ---------------------------------------------------------
+   Default purpose:
+   - The fixed textbox at the top of the tag box.
+   - Styled to match dark mode.
+   ========================================================= */
+#tagTextInput {
+  width: 100%;
+  padding: 12px 14px;
+  border: 1px solid var(--border-strong);
+  border-radius: 10px;
+  outline: none;
+  font-size: 15px;
+  background: var(--bg-input);
+  color: var(--text-main);
+  transition: border-color 0.2s ease, background 0.2s ease;
+}
+
+#tagTextInput:focus {
+  border-color: var(--link);
+  background: #1C1C1C;
+}
+
+#tagTextInput::placeholder {
+  color: var(--text-placeholder);
+}
+
+
+/* =========================================================
+   TAG LIST
+   ---------------------------------------------------------
+   Default purpose:
+   - Holds all generated tags below the textbox.
+   - gap controls spacing between tags.
+   ========================================================= */
+.tag-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px; /* Gap among tags */
+  align-content: flex-start;
+  min-height: 24px;
+}
+
+
+/* =========================================================
+   TAG PILLS
+   ---------------------------------------------------------
+   Default purpose:
+   - Each tag behaves like a removable button.
+   ========================================================= */
+.tag-pill {
+  border: 1px solid transparent;
+  border-radius: 999px;
+  padding: 8px 14px;
+  background: var(--tag-bg);
+  color: var(--tag-text);
+  cursor: pointer;
+  font-size: 14px;
+  transition: background 0.2s ease, border-color 0.2s ease;
+}
+
+.tag-pill:hover {
+  background: var(--tag-bg-hover);
+  border-color: #5870AA;
+}
+
+
+/* =========================================================
+   JSON DOWNLOAD LINK
+   ---------------------------------------------------------
+   Default purpose:
+   - Styles the actual clickable link shown after JSON creation.
+   - Target the anchor inside #jsonDownload, not just the <p>.
+   ========================================================= */
+#jsonDownload {
+  margin-top: 12px;
+}
+
+#jsonDownload a {
+  color: var(--link);
+  text-decoration: underline;
+  cursor: pointer;
+}
+
+#jsonDownload a:hover {
+  color: var(--link-hover);
+}
+
+
+/* =========================================================
+   FOOTER
+   ---------------------------------------------------------
+   Default purpose:
+   - Fixed footer pinned to the bottom of the viewport.
+   ========================================================= */
 .footer {
-  position: fixed;        /* Sticks to viewport bottom */
+  position: fixed;
   bottom: 0;
   left: 0;
   width: 100%;
-  background: #0f0f0ff2;  /* Semi-transparent dark */
-  color: #ccc;            /* Light gray text */
+  background: #3F1D63F2;
+  color: #FFFFFF;
   text-align: center;
-  padding: 8px 0;         /* Small vertical space */
-  font-size: 0.85em;      /* Smaller than body */
-  font-style: italic;     /* Italic! */
-  z-index: 1000;          /* Above content */
+  padding: 8px 0;
+  font-size: 0.85em;
+  font-style: italic;
+  z-index: 1000;
   line-height: 1.3;
-}
-
-#jsonDownload {
-  color: #1a73e8;
-  text-decoration: underline;
-  cursor: pointer;
-  display: inline-block;
-}
-
-#jsonDownload:hover {
-  color: #0b57d0;
 }
