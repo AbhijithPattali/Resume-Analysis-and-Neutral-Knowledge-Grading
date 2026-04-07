@@ -205,7 +205,7 @@ function escapeHtml(text) {
 // =========================================================
 function renderTagPhase() {
   uploadBox.innerHTML = `
-    <p id="uploadMessage">Enter keywords for matching. Press Enter to turn a word into a tag.</p>
+    <p id="uploadMessage">Enter keywords for matching. Press Enter to turn a word into a tag. \n To remove a tag click on it.</p>
 
     <div id="tagInputBox" class="tag-input-box">
       <input
@@ -284,7 +284,7 @@ function renderTagPhase() {
       }
 
       renderRankedResults(result.ranked_results);
-      alert(result.message);
+      // alert(result.message);
 
     } catch (error) {
       console.error('Failed to send tags:', error);
@@ -394,7 +394,7 @@ async function sendFilesToServer() {
     });
 
     const resultText = await response.text();
-    alert(resultText);
+    // alert(resultText);
 
     // Show phase 2 controls only if backend upload succeeded
     if (response.ok) {
