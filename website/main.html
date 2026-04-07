@@ -22,10 +22,10 @@
     <p>Select multiple CV files or drag and drop them into the box.</p>
 
     <!-- Upload area -->
-    <div class="upload-box" id="uploadBox">
-      <p>Drag and drop CV files here (demo only accepts PDFs).</p>
+    <div id="uploadBox" class="upload-box" >
+      <p id="uploadMessage">Drag and drop CV files here (demo only accepts PDFs).</p>
 
-      <div class="actions">
+      <div id="actionsContainer" class="actions" >
         <button id="chooseFilesBtn" type="button">Choose files</button>
         <input id="fileInput" type="file" accept="application/pdf,.pdf" multiple />
         <button id="sendToServerBtn" type="button">Continue</button>

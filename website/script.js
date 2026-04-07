@@ -7,6 +7,8 @@ const fileList = document.getElementById('fileList');
 const fileCounter = document.getElementById('fileCounter');
 const sendToServerBtn = document.getElementById('sendToServerBtn');
 const jsonDownload = document.getElementById('jsonDownload');
+const uploadMessage = document.getElementById('uploadMessage');
+const actionsContainer = document.getElementById('actionsContainer');
 
 // Store selected files temporarily in browser memory
 const temporaryFiles = [];
@@ -149,14 +151,34 @@ async function sendFilesToServer() {
 
     // Show a download link only if the backend upload succeeded
     if (response.ok) {
+      uploadMessage.textContent =
+        'CVs uploaded and JSON generated, hit CONTINUE to select the tags.';
+
+      actionsContainer.innerHTML = `
+        <button id="continueNextBtn" type="button">Continue Next</button>
+        <button id="restartBtn" type="button">Restart</button>
+      `;
+
       jsonDownload.innerHTML = `
         <a href="http://127.0.0.1:5000/download-json" target="_blank">
           Click here to download raw JSON
         </a>
       `;
+
+      const continueNextBtn = document.getElementById('continueNextBtn');
+      continueNextBtn.addEventListener('click', () => {
+        alert('Next page will be the tag selection screen.');
+      });
+
+      const restartBtn = document.getElementById('restartBtn');
+      restartBtn.addEventListener('click', () => {
+        window.location.reload();
+      });
+      
     } else {
       jsonDownload.textContent = '';
     }
+
   } catch (error) {
     console.error('Upload failed:', error);
     jsonDownload.textContent = '';
