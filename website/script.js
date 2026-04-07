@@ -167,17 +167,23 @@ function renderTagPhase() {
       const value = tagTextInput.value.trim();
       if (!value) return;
 
-      const normalizedTag = value.replace(/\s+/g, ' ');
+      const splitTags = value
+        .toLowerCase()
+        .trim()
+        .split(/\s+/)
+        .filter(Boolean);
 
-      const alreadyExists = temporaryTags.some(
-        (tag) => tag.toLowerCase() === normalizedTag.toLowerCase()
-      );
+      splitTags.forEach((singleTag) => {
+        const alreadyExists = temporaryTags.some(
+          (tag) => tag.toLowerCase() === singleTag.toLowerCase()
+        );
 
-      if (!alreadyExists) {
-        temporaryTags.push(normalizedTag);
-        renderTags();
-      }
+        if (!alreadyExists) {
+          temporaryTags.push(singleTag);
+        }
+      });
 
+      renderTags();
       tagTextInput.value = '';
     }
   });
