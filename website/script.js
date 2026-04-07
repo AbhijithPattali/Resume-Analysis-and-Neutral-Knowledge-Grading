@@ -9,6 +9,7 @@ const sendToServerBtn = document.getElementById('sendToServerBtn');
 const jsonDownload = document.getElementById('jsonDownload');
 const uploadMessage = document.getElementById('uploadMessage');
 const actionsContainer = document.getElementById('actionsContainer');
+const fileSectionTitle = document.getElementById('fileSectionTitle');
 
 // Store selected files temporarily in browser memory
 const temporaryFiles = [];
@@ -181,8 +182,35 @@ function renderTagPhase() {
     }
   });
 
-  tagContinueBtn.addEventListener('click', () => {
-    alert(`Selected tags: ${temporaryTags.join(', ') || 'None'}`);
+  tagContinueBtn.addEventListener('click', async () => {
+    if (temporaryTags.length === 0) {
+      alert('Please add at least one tag first.');
+      return;
+    }
+
+    try {
+      const response = await fetch('http://127.0.0.1:5000/submit-tags', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ tags: temporaryTags })
+      });
+
+      const result = await response.json();
+
+      if (!response.ok) {
+        alert(result.message || 'Tag comparison failed.');
+        return;
+      }
+
+      renderRankedResults(result.ranked_results);
+      alert(result.message);
+      
+    } catch (error) {
+      console.error('Failed to send tags:', error);
+      alert('Failed to send tags to server.');
+    }
   });
 
   tagRestartBtn.addEventListener('click', () => {
@@ -208,6 +236,38 @@ function renderTags() {
     });
 
     tagList.appendChild(tagButton);
+  });
+}
+
+function renderRankedResults(rankedResults) {
+  if (fileSectionTitle) {
+    fileSectionTitle.textContent = 'Ranked List';
+  }
+
+  if (!rankedResults || rankedResults.length === 0) {
+    fileList.className = 'empty';
+    fileList.textContent = 'No ranked results available.';
+    return;
+  }
+
+  fileList.className = '';
+  fileList.innerHTML = '';
+
+  rankedResults.forEach((result, index) => {
+    const row = document.createElement('div');
+    row.className = 'file-item';
+
+    const meta = document.createElement('div');
+    meta.className = 'meta';
+
+    meta.innerHTML = `
+      <div><strong>${index + 1}. ${escapeHtml(result.filename)}</strong></div>
+      <div class="small">Match count: ${result.match_count}</div>
+      <div class="small">Matched tokens: ${result.matched_tokens.length ? escapeHtml(result.matched_tokens.join(', ')) : 'No exact matches'}</div>
+    `;
+
+    row.appendChild(meta);
+    fileList.appendChild(row);
   });
 }
 
