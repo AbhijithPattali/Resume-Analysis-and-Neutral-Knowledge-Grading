@@ -1,5 +1,9 @@
-
-// Get the main page elements used by the upload interface
+// =========================================================
+// DOM REFERENCES
+// ---------------------------------------------------------
+// Main elements used across phase 1 (upload) and the
+// ranked-results area.
+// =========================================================
 const uploadBox = document.getElementById('uploadBox');
 const chooseFilesBtn = document.getElementById('chooseFilesBtn');
 const fileInput = document.getElementById('fileInput');
@@ -11,17 +15,35 @@ const uploadMessage = document.getElementById('uploadMessage');
 const actionsContainer = document.getElementById('actionsContainer');
 const fileSectionTitle = document.getElementById('fileSectionTitle');
 
-// Store selected files temporarily in browser memory
+
+// =========================================================
+// TEMPORARY FRONTEND STATE
+// ---------------------------------------------------------
+// temporaryFiles stores uploaded PDF files before sending
+// them to Flask.
+// temporaryTags stores user-entered keyword tags.
+// =========================================================
 const temporaryFiles = [];
 const temporaryTags = [];
 const MAX_FILES = 20;
 
-// Button and input event setup
+
+// =========================================================
+// INITIAL EVENT BINDINGS
+// ---------------------------------------------------------
+// Set up upload button, file input, and phase 1 Continue.
+// =========================================================
 chooseFilesBtn.addEventListener('click', () => fileInput.click());
 fileInput.addEventListener('change', (event) => handleFiles(event.target.files));
 sendToServerBtn.addEventListener('click', sendFilesToServer);
 
-// Highlight the upload area while files are dragged over it
+
+// =========================================================
+// DRAG AND DROP UI FEEDBACK
+// ---------------------------------------------------------
+// Add/remove highlight state while dragging files over the
+// upload area.
+// =========================================================
 ['dragenter', 'dragover'].forEach((eventName) => {
   uploadBox.addEventListener(eventName, (event) => {
     event.preventDefault();
@@ -29,7 +51,6 @@ sendToServerBtn.addEventListener('click', sendFilesToServer);
   });
 });
 
-// Remove highlight when dragging ends or files are dropped
 ['dragleave', 'drop'].forEach((eventName) => {
   uploadBox.addEventListener(eventName, (event) => {
     event.preventDefault();
@@ -37,12 +58,25 @@ sendToServerBtn.addEventListener('click', sendFilesToServer);
   });
 });
 
-// Handle files dropped into the upload area
+
+// =========================================================
+// FILE DROP HANDLER
+// ---------------------------------------------------------
+// Accept dropped files and route them through the same file
+// processing logic as manual file selection.
+// =========================================================
 uploadBox.addEventListener('drop', (event) => {
   const droppedFiles = event.dataTransfer.files;
   handleFiles(droppedFiles);
 });
 
+
+// =========================================================
+// FILE HANDLING
+// ---------------------------------------------------------
+// Validate files, enforce the file limit, accept only PDFs,
+// and store them temporarily in browser memory.
+// =========================================================
 function handleFiles(fileCollection) {
   const files = Array.from(fileCollection);
   const totalAfterUpload = temporaryFiles.length + files.length;
@@ -74,11 +108,26 @@ function handleFiles(fileCollection) {
   fileInput.value = '';
 }
 
+
+// =========================================================
+// FILE COUNTER
+// ---------------------------------------------------------
+// Update the visible x/20 upload count shown in phase 1.
+// =========================================================
 function updateCounter() {
   fileCounter.textContent =
     `In this demo we are accepting only ${temporaryFiles.length}/${MAX_FILES} files`;
 }
 
+
+// =========================================================
+// FILE LIST RENDERER
+// ---------------------------------------------------------
+// Render selected files into the list area.
+// Current behavior:
+// - showRemoveButton = true  -> phase 1 editable list
+// - showRemoveButton = false -> phase 2 locked list
+// =========================================================
 function renderFiles(showRemoveButton = true) {
   if (temporaryFiles.length === 0) {
     fileList.className = 'empty';
@@ -120,18 +169,40 @@ function renderFiles(showRemoveButton = true) {
   });
 }
 
+
+// =========================================================
+// HELPER: BYTE FORMATTER
+// ---------------------------------------------------------
+// Convert raw file size bytes into readable KB/MB text.
+// =========================================================
 function formatBytes(bytes) {
   if (bytes < 1024) return `${bytes} B`;
   if (bytes < 1024 * 1024) return `${(bytes / 1024).toFixed(1)} KB`;
   return `${(bytes / (1024 * 1024)).toFixed(2)} MB`;
 }
 
+
+// =========================================================
+// HELPER: HTML ESCAPER
+// ---------------------------------------------------------
+// Safely render user-facing text into the DOM.
+// =========================================================
 function escapeHtml(text) {
   const div = document.createElement('div');
   div.textContent = text;
   return div.innerHTML;
 }
 
+
+// =========================================================
+// PHASE 2: TAG ENTRY SCREEN
+// ---------------------------------------------------------
+// Replace the upload box contents with the tag-entry UI.
+// Current behavior:
+// - User types one or more words
+// - Pressing Enter creates separate tags
+// - Clicking Continue sends tags to Flask
+// =========================================================
 function renderTagPhase() {
   uploadBox.innerHTML = `
     <p id="uploadMessage">Enter keywords for matching. Press Enter to turn a word into a tag.</p>
@@ -160,6 +231,7 @@ function renderTagPhase() {
 
   renderTags();
 
+  // Press Enter to convert text into one or more separate tags
   tagTextInput.addEventListener('keydown', (event) => {
     if (event.key === 'Enter') {
       event.preventDefault();
@@ -188,6 +260,7 @@ function renderTagPhase() {
     }
   });
 
+  // Send tags to backend for exact token matching
   tagContinueBtn.addEventListener('click', async () => {
     if (temporaryTags.length === 0) {
       alert('Please add at least one tag first.');
@@ -212,7 +285,7 @@ function renderTagPhase() {
 
       renderRankedResults(result.ranked_results);
       alert(result.message);
-      
+
     } catch (error) {
       console.error('Failed to send tags:', error);
       alert('Failed to send tags to server.');
@@ -224,6 +297,13 @@ function renderTagPhase() {
   });
 }
 
+
+// =========================================================
+// TAG RENDERER
+// ---------------------------------------------------------
+// Render all current tags as clickable pills.
+// Clicking a tag removes it.
+// =========================================================
 function renderTags() {
   const tagList = document.getElementById('tagList');
   if (!tagList) return;
@@ -245,6 +325,16 @@ function renderTags() {
   });
 }
 
+
+// =========================================================
+// RANKED RESULTS RENDERER
+// ---------------------------------------------------------
+// Replace the original uploaded-file list with ranked CV
+// results returned from Flask.
+// Current behavior:
+// - Changes heading to "Ranked List"
+// - Shows filename, match count, and matched tokens
+// =========================================================
 function renderRankedResults(rankedResults) {
   if (fileSectionTitle) {
     fileSectionTitle.textContent = 'Ranked List';
@@ -277,6 +367,13 @@ function renderRankedResults(rankedResults) {
   });
 }
 
+
+// =========================================================
+// PHASE 1: SEND FILES TO BACKEND
+// ---------------------------------------------------------
+// Upload selected PDFs to Flask, lock the file list, and
+// transition the interface into the next stage.
+// =========================================================
 async function sendFilesToServer() {
   if (temporaryFiles.length === 0) {
     alert('Please add at least one CV first.');
@@ -299,7 +396,7 @@ async function sendFilesToServer() {
     const resultText = await response.text();
     alert(resultText);
 
-    // Show a download link only if the backend upload succeeded
+    // Show phase 2 controls only if backend upload succeeded
     if (response.ok) {
       uploadMessage.textContent =
         'CVs uploaded and JSON generated, hit PROCEED to select the tags.';
@@ -326,7 +423,7 @@ async function sendFilesToServer() {
       restartBtn.addEventListener('click', () => {
         window.location.reload();
       });
-      
+
     } else {
       jsonDownload.textContent = '';
     }
@@ -337,5 +434,10 @@ async function sendFilesToServer() {
   }
 }
 
-// Show the initial upload counter when the page loads
+
+// =========================================================
+// INITIAL PAGE STATE
+// ---------------------------------------------------------
+// Show the starting file counter on first page load.
+// =========================================================
 updateCounter();
