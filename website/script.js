@@ -12,6 +12,7 @@ const actionsContainer = document.getElementById('actionsContainer');
 
 // Store selected files temporarily in browser memory
 const temporaryFiles = [];
+const temporaryTags = [];
 const MAX_FILES = 20;
 
 // Button and input event setup
@@ -77,7 +78,7 @@ function updateCounter() {
     `In this demo we are accepting only ${temporaryFiles.length}/${MAX_FILES} files`;
 }
 
-function renderFiles() {
+function renderFiles(showRemoveButton = true) {
   if (temporaryFiles.length === 0) {
     fileList.className = 'empty';
     fileList.textContent = 'No files uploaded yet.';
@@ -98,19 +99,22 @@ function renderFiles() {
       <div class="small">${formatBytes(item.size)} | Temporary index: ${index}</div>
     `;
 
-    const removeBtn = document.createElement('button');
-    removeBtn.type = 'button';
-    removeBtn.textContent = 'Remove';
-
-    // Remove one selected file from the temporary list
-    removeBtn.addEventListener('click', () => {
-      temporaryFiles.splice(index, 1);
-      renderFiles();
-      updateCounter();
-    });
-
     row.appendChild(meta);
-    row.appendChild(removeBtn);
+
+    if (showRemoveButton) {
+      const removeBtn = document.createElement('button');
+      removeBtn.type = 'button';
+      removeBtn.textContent = 'Remove';
+
+      removeBtn.addEventListener('click', () => {
+        temporaryFiles.splice(index, 1);
+        renderFiles(true);
+        updateCounter();
+      });
+
+      row.appendChild(removeBtn);
+    }
+
     fileList.appendChild(row);
   });
 }
@@ -125,6 +129,86 @@ function escapeHtml(text) {
   const div = document.createElement('div');
   div.textContent = text;
   return div.innerHTML;
+}
+
+function renderTagPhase() {
+  uploadBox.innerHTML = `
+    <p id="uploadMessage">Enter keywords for matching. Press Enter to turn a word into a tag.</p>
+
+    <div id="tagInputBox" class="tag-input-box">
+      <input
+        id="tagTextInput"
+        type="text"
+        placeholder="Type a keyword like Programmer and press Enter"
+        autocomplete="off"
+      />
+      <div id="tagList" class="tag-list"></div>
+    </div>
+
+    <div id="actionsContainer" class="actions">
+      <button id="tagContinueBtn" type="button">Continue</button>
+      <button id="tagRestartBtn" type="button">Restart</button>
+    </div>
+
+    <p class="small">Example: Programmer, CSS, Python, HTML, JavaScript.</p>
+  `;
+
+  const tagTextInput = document.getElementById('tagTextInput');
+  const tagContinueBtn = document.getElementById('tagContinueBtn');
+  const tagRestartBtn = document.getElementById('tagRestartBtn');
+
+  renderTags();
+
+  tagTextInput.addEventListener('keydown', (event) => {
+    if (event.key === 'Enter') {
+      event.preventDefault();
+
+      const value = tagTextInput.value.trim();
+      if (!value) return;
+
+      const normalizedTag = value.replace(/\s+/g, ' ');
+
+      const alreadyExists = temporaryTags.some(
+        (tag) => tag.toLowerCase() === normalizedTag.toLowerCase()
+      );
+
+      if (!alreadyExists) {
+        temporaryTags.push(normalizedTag);
+        renderTags();
+      }
+
+      tagTextInput.value = '';
+    }
+  });
+
+  tagContinueBtn.addEventListener('click', () => {
+    alert(`Selected tags: ${temporaryTags.join(', ') || 'None'}`);
+  });
+
+  tagRestartBtn.addEventListener('click', () => {
+    window.location.reload();
+  });
+}
+
+function renderTags() {
+  const tagList = document.getElementById('tagList');
+  if (!tagList) return;
+
+  tagList.innerHTML = '';
+
+  temporaryTags.forEach((tag, index) => {
+    const tagButton = document.createElement('button');
+    tagButton.type = 'button';
+    tagButton.className = 'tag-pill';
+    tagButton.textContent = tag;
+
+    tagButton.addEventListener('click', () => {
+      temporaryTags.splice(index, 1);
+      renderTags();
+    });
+
+    tagList.appendChild(tagButton);
+  });
 }
 
 async function sendFilesToServer() {
@@ -152,10 +236,12 @@ async function sendFilesToServer() {
     // Show a download link only if the backend upload succeeded
     if (response.ok) {
       uploadMessage.textContent =
-        'CVs uploaded and JSON generated, hit CONTINUE to select the tags.';
+        'CVs uploaded and JSON generated, hit PROCEED to select the tags.';
+
+      renderFiles(false);
 
       actionsContainer.innerHTML = `
-        <button id="continueNextBtn" type="button">Continue Next</button>
+        <button id="proceedBtn" type="button">Proceed</button>
         <button id="restartBtn" type="button">Restart</button>
       `;
 
@@ -165,9 +251,9 @@ async function sendFilesToServer() {
         </a>
       `;
 
-      const continueNextBtn = document.getElementById('continueNextBtn');
-      continueNextBtn.addEventListener('click', () => {
-        alert('Next page will be the tag selection screen.');
+      const proceedBtn = document.getElementById('proceedBtn');
+      proceedBtn.addEventListener('click', () => {
+        renderTagPhase();
       });
 
       const restartBtn = document.getElementById('restartBtn');
