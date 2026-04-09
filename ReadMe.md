@@ -22,6 +22,7 @@ A typical project structure is shown below:
 
 ```bash
 project-folder/
+├── Sample CVs/ all sameple CVs used
 ├── website/
 │   ├── app.py
 │   ├── list.json (if created)
