@@ -1,3 +1,7 @@
 python -m http.server 5500 --directory website
 
 python website/app.py
+
+pip install flask-cors
+
+pip install flask PyPDF2
